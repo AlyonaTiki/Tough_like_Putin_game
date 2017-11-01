@@ -121,7 +121,7 @@ function setup() {
     character.lives = 3;
     character.coinsCount = 0;
     stuff.add(character)
-    character.debug = true;
+//    character.debug = true;
     
     /*platform setup*/
     platform = createSprite(width / 2 - 60, height - 20);
@@ -178,7 +178,7 @@ function setup() {
         danger_box.addAnimation("idle", dangerImage);
         danger_box.changeAnimation("idle");
         danger_box.hitCharacter = false;
-        danger_box.debug = true;
+//        danger_box.debug = true;
         danger.add(danger_box);
         danger.life = 8;
         
