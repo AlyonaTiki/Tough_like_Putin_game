@@ -329,7 +329,6 @@ else {
         character.lives = 3;
         enter_sfx[floor(random(0, enter_sfx.length))].play();
     }
-
 }
 function game() {
     camera.off();
