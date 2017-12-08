@@ -37,9 +37,9 @@ var menus = [
     {
         titles: [
 			"instructions",
-			"press z to jump",
-			"arrow keys to move",
-			"spaceship is the end of the level"
+			"press SPACE to jump",
+			"D to move",
+			"Flag is the end of the level"
 		],
         buttons: [
             {
@@ -75,6 +75,7 @@ var gameState = 0;
 var currentLevel = 0;
 var levelData = {
     0: {
+        coins: 7,
         walls: 4,
         enemies: 3,
         health: 2,
@@ -82,6 +83,7 @@ var levelData = {
         speedMax: speed
     },
     1: {
+        coins: 9,
         walls: 3,
         enemies: 5,
         health: 1,
@@ -89,7 +91,7 @@ var levelData = {
         speedMax: speed * 1.5
     },
     2: {
-        walls: 2,
+       coins: 6,
         enemies: 9,
         health: 0,
         speedMin: speed / 2,
@@ -294,9 +296,9 @@ function setup() {
         for (let j = 0; j < menu.buttons.length; j++) {
             const b = menu.buttons[j];
             const button = createSprite(440, 120 + j * 120);
-            button.addAnimation("idle", "assets/ui/button/button_0.png");
-            button.addAnimation("hover", "assets/ui/button/button_1.png", "assets/ui/button/button_2.png");
-            button.addAnimation("click", "assets/ui/button/button_3.png", "assets/ui/button/button_4.png");
+            button.addAnimation("idle", "images/but1.png");
+            button.addAnimation("hover", "images/but2.png");
+            button.addAnimation("click", "images/but3_1.png", "images/but3_4.png");
             button.clicked = false;
             button.mouseActive = true;
             button.text = b.text;
@@ -357,64 +359,64 @@ function buildLevel() {
 function draw() {
 
     if (gameState == 0) {
-        intro();
+        menu(0);
     } else if (gameState == 1) {
-        intructions();
+        menu(1);
     } else if (gameState == 2) {
         game();
     } else if (gameState == 4) {
         pause();
     } else if (gameState == 3) {
-        end();
+        menu(3);
     } else if (gameState == 5) {
-        nextLevel();
+        menu(2);
     }
 }
 
-function intro() {
-    camera.off();
-    background(bg);
-    background(bgIntro);
-    image(title, height / 2, width / 2 - 240);
-    fill(255);
-    textSize(24);
-    textAlign(CENTER);
-    textFont("Helvetica");
-    fill(237, 198, 133);
-    text("PRESS ENTER TO PLAY", width / 2 + 10, height / 2 + 35);
-    textSize(20);
-    text("by Alyona Perminova", 230, 430);
-    if (keyWentDown("ENTER")) {
-        gameState = 1;
-        enter_sfx[floor(random(0, enter_sfx.length))].play();
-    }
-}
-
-function intructions() {
-    camera.off();
-    background(bg);
-    background(bgIntro);
-    fill(255);
-    textSize(19);
-    textAlign(CENTER);
-    textFont("Helvetica");
-    text("ARROW RIGHT TO MOVE", width / 2 + 10, height / 2 - 80);
-    text("X TO JUMP", width / 2 + 10, height / 2 - 50);
-    text("Z TO SHOOT", width / 2 + 10, height / 2 - 20);
-    text("SPACE TO PAUSE", width / 2 + 10, height / 2 + 10);
-    fill(237, 198, 133);
-    textSize(24);
-    text("PRESS ENTER TO PLAY", width / 2 + 10, height / 2 + 45);
-    textSize(20);
-    text("by Alyona Perminova", 230, 430);
-    if (keyWentDown("ENTER")) {
-        gameState = 2;
-        enter_sfx[floor(random(0, enter_sfx.length))].play();
-    }
-
-
-}
-
+//function intro() {
+//    camera.off();
+//    background(bg);
+//    background(bgIntro);
+//    image(title, height / 2, width / 2 - 240);
+//    fill(255);
+//    textSize(24);
+//    textAlign(CENTER);
+//    textFont("Helvetica");
+//    fill(237, 198, 133);
+//    text("PRESS ENTER TO PLAY", width / 2 + 10, height / 2 + 35);
+//    textSize(20);
+//    text("by Alyona Perminova", 230, 430);
+//    if (keyWentDown("ENTER")) {
+//        gameState = 1;
+//        enter_sfx[floor(random(0, enter_sfx.length))].play();
+//    }
+//}
+//
+//function intructions() {
+//    camera.off();
+//    background(bg);
+//    background(bgIntro);
+//    fill(255);
+//    textSize(19);
+//    textAlign(CENTER);
+//    textFont("Helvetica");
+//    text("ARROW RIGHT TO MOVE", width / 2 + 10, height / 2 - 80);
+//    text("X TO JUMP", width / 2 + 10, height / 2 - 50);
+//    text("Z TO SHOOT", width / 2 + 10, height / 2 - 20);
+//    text("SPACE TO PAUSE", width / 2 + 10, height / 2 + 10);
+//    fill(237, 198, 133);
+//    textSize(24);
+//    text("PRESS ENTER TO PLAY", width / 2 + 10, height / 2 + 45);
+//    textSize(20);
+//    text("by Alyona Perminova", 230, 430);
+//    if (keyWentDown("ENTER")) {
+//        gameState = 2;
+//        enter_sfx[floor(random(0, enter_sfx.length))].play();
+//    }
+//
+//
+//}
+//
 function pause() {
     camera.off();
     background(bg);
@@ -431,54 +433,54 @@ function pause() {
         enter_sfx[floor(random(0, enter_sfx.length))].play();
     }
 }
-
-function end() {
-    camera.off();
-    background(bgEnd);
-    fill(255);
-    textSize(24);
-    textAlign(CENTER);
-    textFont("Helvetica");
-    fill(237, 198, 133);
-    text("PRESS ENTER TO TRY AGAIN", width / 2 + 10, height / 2 + 25);
-    textSize(19);
-    text("ACHIEVEMENTS:", 180, 355);
-    fill(255);
-    textSize(20);
-    text("= " + character.coinsCount, 180, 400);
-    image(img, 105, 374);
-    if (character.coinsCount < 6) {
-        text("GOOD JOB!", 270, 400);
-    } else if (character.coinsCount > 6 && character.coinsCount < 15) {
-        text("GREAT JOB!", 270, 400);
-    } else {
-        text("EXCELLENT!", 270, 400);
-    }
-
-
-
-    if (keyWentDown("ENTER")) {
-        gameState = 1;
-        reset();
-        buildLevel(4, 3, 2);
-        enter_sfx[floor(random(0, enter_sfx.length))].play();
-    }
-}
-
-function nextLevel() {
-    camera.off();
-    background(100);
-    fill(255);
-    textSize(24);
-    textAlign(CENTER);
-    text("you beat level " + currentLevel, width / 2, height / 2);
-    text("press enter to begin " + (currentLevel + 1), width / 2, height / 2 + 48);
-    if (keyWentDown("ENTER")) {
-        gameState = 2;
-        reset();
-        buildLevel(3, 10, 1);
-    }
-}
+//
+//function end() {
+//    camera.off();
+//    background(bgEnd);
+//    fill(255);
+//    textSize(24);
+//    textAlign(CENTER);
+//    textFont("Helvetica");
+//    fill(237, 198, 133);
+//    text("PRESS ENTER TO TRY AGAIN", width / 2 + 10, height / 2 + 25);
+//    textSize(19);
+//    text("ACHIEVEMENTS:", 180, 355);
+//    fill(255);
+//    textSize(20);
+//    text("= " + character.coinsCount, 180, 400);
+//    image(img, 105, 374);
+//    if (character.coinsCount < 6) {
+//        text("GOOD JOB!", 270, 400);
+//    } else if (character.coinsCount > 6 && character.coinsCount < 15) {
+//        text("GREAT JOB!", 270, 400);
+//    } else {
+//        text("EXCELLENT!", 270, 400);
+//    }
+//
+//
+//
+//    if (keyWentDown("ENTER")) {
+//        gameState = 1;
+//        reset();
+//        buildLevel(4, 3, 2);
+//        enter_sfx[floor(random(0, enter_sfx.length))].play();
+//    }
+//}
+//
+//function nextLevel() {
+//    camera.off();
+//    background(100);
+//    fill(255);
+//    textSize(24);
+//    textAlign(CENTER);
+//    text("you beat level " + currentLevel, width / 2, height / 2);
+//    text("press enter to begin " + (currentLevel + 1), width / 2, height / 2 + 48);
+//    if (keyWentDown("ENTER")) {
+//        gameState = 2;
+//        reset();
+//        buildLevel(3, 10, 1);
+//    }
+//}
 
 function menu(index) {
     camera.off();
@@ -537,7 +539,7 @@ function game() {
     background(bg1);
     camera.on();
 
-    if (keyWentDown("SPACE")) {
+    if (keyWentDown("p")) {
         gameState = 4;
     }
 
@@ -571,7 +573,7 @@ function game() {
         character.velocity.y += GRAVITY;
     }
 
-    if (keyWentDown("w")) {
+    if (keyWentDown("space")) {
         if (!character.isJumping) {
             character.changeAnimation("jump")
             character.velocity.y -= JUMP_SPEED;
@@ -582,16 +584,9 @@ function game() {
 
 
     }
-    if (keyWentDown("shift")) {
-        var shoot = createSprite(character.position.x + 60, character.position.y - 5);
-        const shoot1 = loadImage("images/shoot.png");
-        shoot.addImage(shoot1);
-        //shoot.debug = true;
-        shoot.velocity.x = 20;
-        shoot_sfx[floor(random(0, shoot_sfx.length))].play();
-        bullets.add(shoot);
+   
 
-    }
+    
     for (let i = 0; i < danger.length; i++) {
         const danger_box = danger[i];
         if (character.overlap(danger_box)) {
@@ -731,6 +726,9 @@ function game() {
     }
 }
 
+function mouseClicked() {
+    shootBullet();
+}
 
 function wrap(obj, reset) {
     if (character.position.x - obj.position.x - obj.width / 2 >= 40) {
@@ -738,6 +736,21 @@ function wrap(obj, reset) {
     }
 }
 
+function shootBullet() {
+   
+ 
+ var shoot = createSprite(character.position.x + 60, character.position.y - 5);
+    const shoot1 = loadImage("images/shoot.png");
+    shoot.addImage(shoot1);
+    var dir = new p5.Vector(shoot.position.x + mouseX, mouseY);
+    dir.sub(shoot.position);
+    dir.normalize();
+    dir.mult(10);
+    shoot.velocity = dir;
+    shoot_sfx[floor(random(0, shoot_sfx.length))].play();
+        bullets.add(shoot);
+}
+    
 function constantMovement() {
     if (keyDown("d")) {
         character.position.x += speed;
