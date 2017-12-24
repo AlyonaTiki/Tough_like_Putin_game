@@ -17,15 +17,14 @@ const enemySpeedMin = speed / 2,
 const cloudSpeedMin = speed / 8,
     cloudSpeedMax = speed / 3;
 
-/* 0=intro, 1=instruction, 2=game, 3=ending*/
 var menus = [
     {
         titles: [
-			"my first game by &"
+"press to start"
 		],
         buttons: [
             {
-                text: "Play Game",
+                text: "Play",
                 state: 2
 			},
             {
@@ -36,25 +35,25 @@ var menus = [
 	},
     {
         titles: [
-			"instructions",
 			"press SPACE to jump",
-			"D to move",
+			"D to move", "mouse to aim & shoot",
 			"Flag is the end of the level"
 		],
         buttons: [
             {
-                text: "Play Game",
+                text: "Play",
                 state: 2
 			}
 		]
 	},
     {
         titles: [
-			"you beat level 1"
+			"Great job!",
+            "press start for next level"
 		],
         buttons: [
             {
-                text: "Start Level 2",
+                text: "Start",
                 state: 2
 			}
 		]
@@ -72,36 +71,57 @@ var menus = [
 	}
 ];
 var gameState = 0;
-var currentLevel = 0;
+var currentLevel = 1;
 var levelData = {
     0: {
+        bushes: 4,
+        walls: 3,
         coins: 7,
-        walls: 4,
         enemies: 3,
+        enemiesMinPos: 460 - 120,
+        enemiesMaxPos: 460 - 130,
         health: 2,
         speedMin: speed / 5,
         speedMax: speed
     },
     1: {
-        coins: 9,
+        bushes: 4,
         walls: 3,
+        coins: 7,
+        enemies: 3,
+        enemiesMinPos: 460 - 120,
+        enemiesMaxPos: 460 - 130,
+        health: 2,
+        speedMin: speed / 5,
+        speedMax: speed
+    },
+    2: {
+        bushes: 4,
+        walls: 4,
+        coins: 9,
         enemies: 5,
+        enemiesMinPos: 460 - 20,
+        enemiesMaxPos: 460 - 170,
         health: 1,
         speedMin: speed / 4,
         speedMax: speed * 1.5
     },
-    2: {
-       coins: 6,
+    3: {
+
+        bushes: 4,
+        walls: 5,
+        coins: 6,
         enemies: 9,
+        enemiesMinPos: 460,
+        enemiesMaxPos: 460 - 180,
         health: 0,
         speedMin: speed / 2,
         speedMax: speed * 2
     }
 };
-/*graphics*/
-
 /*audio*/
 var bg_music;
+var bg_music_int;
 var jump_sfx = []
 const jump_files = [
   "sfx/character/jump1.wav",
@@ -136,14 +156,15 @@ var pickUpLife_sfx = []
 const pickUpLife_files = [
   "sfx/pickUpLife.wav",
 ];
+var flag_sfx = []
+const flag_files = [
+  "sfx/flag.wav",
+];
 
 function preload() {
-    img = loadImage("images/coin1.png");
     boxUI = loadImage("images/box2.png");
-    soundIconOn = loadImage("images/speaker.png");
-    soundIconOff = loadImage("images/mute.png");
     title = loadImage("images/title.png");
-    bg_music = loadSound("sound/bg_music2.wav");
+    bg_music_int = loadSound("sound/Pause-Intro3.mp3");
 
     for (let i = 0; i < jump_files.length; i++) {
         const jump_sound = loadSound(jump_files[i]);
@@ -173,10 +194,15 @@ function preload() {
         const pickUpLife_sound = loadSound(pickUpLife_files[i]);
         pickUpLife_sfx.push(pickUpLife_sound);
     }
+    for (let i = 0; i < flag_files.length; i++) {
+        const flag_sound = loadSound(flag_files[i]);
+        flag_sfx.push(flag_sound);
+    }
 }
 
 function setup() {
-    bg_music.loop();
+
+    bg_music_int.loop();
     bg = loadImage("images/bg1_1.png");
     bg1 = loadImage("images/bg2_5.png");
     bgIntro = loadImage("images/start.png");
@@ -205,7 +231,6 @@ function setup() {
     character.lives = 3;
     character.coinsCount = 0;
     stuff.add(character)
-    //    character.debug = true;
 
     /*platform setup*/
     platform = createSprite(width / 2 - 60, height - 20);
@@ -214,43 +239,18 @@ function setup() {
     stuff.add(platform)
 
     /*flag*/
-
-    flag = createSprite(width * 3, height / 2, width / 3, height / 2);
-    const flag_anim = loadAnimation("images/flag1.png", "images/flag3.png");
-    const flag_anim2 = loadAnimation("images/flag1_1.png", "images/flag3_3.png");
+    flag = createSprite(width * 4, height / 2 + 80, width / 3, height / 3);
+    const flag_anim = loadAnimation("images/flag10.png", "images/flag18.png");
+    //    const flag_anim2 = loadAnimation("images/flag1.png", "images/flag9.png");
     flag.addAnimation("flag", flag_anim);
-    flag.addAnimation("flag2", flag_anim2);
+    //    flag.addAnimation("flag2", flag_anim2);
+    stuff.add(flag)
 
     /*obstacles: walls,...*/
 
-    for (let i = 0; i < NUM_WALLS; i++) {
-        // console.log(32, (i + 3) * width / NUM_WALLS)
-        const wall = createSprite(
-            random(i * width / NUM_WALLS, (i + 1) * width / NUM_WALLS),
-            height * 7 / 9 + 10,
 
-        );
-        const imageArray = ["images/wall1_1.png", "images/wall1_2.png", "images/wall1_3.png"];
-        const imageIndex = floor(random(0, imageArray.length));
-        const wall1 = loadImage(imageArray[imageIndex]);
-        wall.addImage("walls", wall1);
-        walls.add(wall);
-    }
     bushes_group = new Group();
-    for (let i = 0; i < NUM_BUSHES; i++) {
-        // console.log(32, (i + 1) * width / NUM_BUSHES)
-        const bushes = createSprite(
-            random(i * width / NUM_BUSHES, (i + 1) * width / NUM_BUSHES),
-            height * 7 / 9 + 10,
 
-        );
-        const imageArray = ["images/tree1_1.png", "images/tree2_2.png", "images/obs3_3.png"];
-        const imageIndex = floor(random(0, imageArray.length));
-        const bushes1 = loadImage(imageArray[imageIndex]);
-        bushes.addImage("bushes", bushes1);
-        bushes_group.add(bushes);
-        //bushes.life = 140;
-    }
 
     /*danger boxes*/
     danger = new Group();
@@ -259,19 +259,15 @@ function setup() {
             random(0, width),
             height - 65
         );
-        const imageArray = ["images/boxC.png", "images/boxD.png"];
+        const imageArray = ["images/boxCcopy.png", "images/boxDcopy.png"];
         const imageIndex = floor(random(0, imageArray.length));
         const dangerImage = loadAnimation(imageArray[imageIndex]);
-
-        // danger_box.addAnimation("explosion", explosion_anim);
         danger_box.addAnimation("idle", dangerImage);
         danger_box.changeAnimation("idle");
         danger_box.hitCharacter = false;
-        //        danger_box.debug = true;
         danger.add(danger_box);
         danger.life = 8;
 
-        //explosion_anim.looping = false
     }
 
     /*clouds*/
@@ -290,15 +286,16 @@ function setup() {
         clouds.add(cloud);
     }
     buildLevel();
+
     for (let i = 0; i < menus.length; i++) {
         const menu = menus[i];
         menu.sprites = new Group();
         for (let j = 0; j < menu.buttons.length; j++) {
             const b = menu.buttons[j];
-            const button = createSprite(440, 120 + j * 120);
+            const button = createSprite(520, 200 + j * 60);
             button.addAnimation("idle", "images/but1.png");
             button.addAnimation("hover", "images/but2.png");
-            button.addAnimation("click", "images/but3_1.png", "images/but3_4.png");
+            button.addAnimation("click", "images/but3.png");
             button.clicked = false;
             button.mouseActive = true;
             button.text = b.text;
@@ -310,21 +307,10 @@ function setup() {
 
 function buildLevel() {
     var level = levelData[currentLevel];
-    for (let i = 0; i < level.walls; i++) {
-        const wall = createSprite(
-            i * width * 2 / level.walls,
-            random(height * 7 / 8, height / 2),
-            200,
-            40
-        );
-        //wall.debug = true;
-        walls.add(wall);
-    }
-
     for (let i = 0; i < level.enemies; i++) {
         const enemy = createSprite(
             random(width * 2, width * 4),
-            random(height - 115, height - 135),
+            random(level.enemiesMinPos, level.enemiesMaxPos),
         );
         const torpedo_anim = loadAnimation("images/torpedo1.png", "images/torpedo3.png");
         enemy.addAnimation("enem", torpedo_anim);
@@ -353,152 +339,75 @@ function buildLevel() {
         coin.animation.frameDelay = 10;
         coins.add(coin);
     }
+    for (let i = 0; i < level.walls; i++) {
+        const wall = createSprite(
+            random(i * width / NUM_WALLS, (i + 1) * width / NUM_WALLS),
+            height * 7 / 9 + 10,
+
+        );
+        const imageArray = ["images/wall1_1.png", "images/wall1_2.png", "images/wall1_3.png"];
+        const imageIndex = floor(random(0, imageArray.length));
+        const wall1 = loadImage(imageArray[imageIndex]);
+        wall.addImage("walls", wall1);
+        walls.add(wall);
+    }
+    for (let i = 0; i < level.bushes; i++) {
+        // console.log(32, (i + 1) * width / NUM_BUSHES)
+        const bushes = createSprite(
+            random(i * width / NUM_BUSHES, (i + 1) * width / NUM_BUSHES),
+            height * 7 / 9 + 10,
+
+        );
+        const imageArray = ["images/tree1_1.png", "images/tree2_2.png", "images/obs3_3.png"];
+        const imageIndex = floor(random(0, imageArray.length));
+        const bushes1 = loadImage(imageArray[imageIndex]);
+        bushes.addImage("bushes", bushes1);
+        bushes_group.add(bushes);
+
+    }
 
 }
 
 function draw() {
-
     if (gameState == 0) {
-        menu(0);
+        menu(0); //intro();
     } else if (gameState == 1) {
-        menu(1);
+        menu(1); //intructions();
     } else if (gameState == 2) {
         game();
-    } else if (gameState == 4) {
-        pause();
     } else if (gameState == 3) {
-        menu(3);
-    } else if (gameState == 5) {
-        menu(2);
+        menu(3); //dead();
+    } else if (gameState == 4) {
+        menu(2); // nextLevel();
     }
 }
 
-//function intro() {
-//    camera.off();
-//    background(bg);
-//    background(bgIntro);
-//    image(title, height / 2, width / 2 - 240);
-//    fill(255);
-//    textSize(24);
-//    textAlign(CENTER);
-//    textFont("Helvetica");
-//    fill(237, 198, 133);
-//    text("PRESS ENTER TO PLAY", width / 2 + 10, height / 2 + 35);
-//    textSize(20);
-//    text("by Alyona Perminova", 230, 430);
-//    if (keyWentDown("ENTER")) {
-//        gameState = 1;
-//        enter_sfx[floor(random(0, enter_sfx.length))].play();
-//    }
-//}
-//
-//function intructions() {
-//    camera.off();
-//    background(bg);
-//    background(bgIntro);
-//    fill(255);
-//    textSize(19);
-//    textAlign(CENTER);
-//    textFont("Helvetica");
-//    text("ARROW RIGHT TO MOVE", width / 2 + 10, height / 2 - 80);
-//    text("X TO JUMP", width / 2 + 10, height / 2 - 50);
-//    text("Z TO SHOOT", width / 2 + 10, height / 2 - 20);
-//    text("SPACE TO PAUSE", width / 2 + 10, height / 2 + 10);
-//    fill(237, 198, 133);
-//    textSize(24);
-//    text("PRESS ENTER TO PLAY", width / 2 + 10, height / 2 + 45);
-//    textSize(20);
-//    text("by Alyona Perminova", 230, 430);
-//    if (keyWentDown("ENTER")) {
-//        gameState = 2;
-//        enter_sfx[floor(random(0, enter_sfx.length))].play();
-//    }
-//
-//
-//}
-//
-function pause() {
+
+function menu(index) {
+    console.log(currentLevel);
     camera.off();
     background(bg);
     background(bgIntro);
-    textAlign(CENTER);
-    textFont("Helvetica");
     fill(237, 198, 133);
-    textSize(33);
-    text("PAUSE", width / 2 + 10, height / 2 + 5);
-    textSize(20);
-    text("by Alyona Perminova", 230, 430);
-    if (keyWentDown("SPACE")) {
-        gameState = 2;
-        enter_sfx[floor(random(0, enter_sfx.length))].play();
-    }
-}
-//
-//function end() {
-//    camera.off();
-//    background(bgEnd);
-//    fill(255);
-//    textSize(24);
-//    textAlign(CENTER);
-//    textFont("Helvetica");
-//    fill(237, 198, 133);
-//    text("PRESS ENTER TO TRY AGAIN", width / 2 + 10, height / 2 + 25);
-//    textSize(19);
-//    text("ACHIEVEMENTS:", 180, 355);
-//    fill(255);
-//    textSize(20);
-//    text("= " + character.coinsCount, 180, 400);
-//    image(img, 105, 374);
-//    if (character.coinsCount < 6) {
-//        text("GOOD JOB!", 270, 400);
-//    } else if (character.coinsCount > 6 && character.coinsCount < 15) {
-//        text("GREAT JOB!", 270, 400);
-//    } else {
-//        text("EXCELLENT!", 270, 400);
-//    }
-//
-//
-//
-//    if (keyWentDown("ENTER")) {
-//        gameState = 1;
-//        reset();
-//        buildLevel(4, 3, 2);
-//        enter_sfx[floor(random(0, enter_sfx.length))].play();
-//    }
-//}
-//
-//function nextLevel() {
-//    camera.off();
-//    background(100);
-//    fill(255);
-//    textSize(24);
-//    textAlign(CENTER);
-//    text("you beat level " + currentLevel, width / 2, height / 2);
-//    text("press enter to begin " + (currentLevel + 1), width / 2, height / 2 + 48);
-//    if (keyWentDown("ENTER")) {
-//        gameState = 2;
-//        reset();
-//        buildLevel(3, 10, 1);
-//    }
-//}
-
-function menu(index) {
-    camera.off();
-    background(51);
-    fill(255);
-    textSize(24);
-    textFont("sans-serif");
+    textSize(19);
+    image(title, height / 2, width / 2 - 270);
+    textFont("Monaco");
     textAlign(LEFT);
+
     for (let i = 0; i < menus[index].titles.length; i++) {
-        text(menus[index].titles[i], 40, 40 + i * 60, width / 3, height);
+        text(menus[index].titles[i], 210, 200 + i * 26, width / 2, height);
     }
 
     for (let i = 0; i < menus[index].sprites.length; i++) {
         const button = menus[index].sprites[i];
         button.display();
-        textFont("Monaco");
+
         textAlign(CENTER);
         text(button.text, button.position.x, button.position.y);
+
+
+        textSize(20);
+        text("by Alyona Perminova", 230, 430);
         if (button.mouseIsPressed) {
             button.changeAnimation("click");
             button.clicked = true;
@@ -509,6 +418,7 @@ function menu(index) {
                 if (index == 2 || index == 3) {
                     reset();
                     buildLevel();
+
                 }
             }
         } else {
@@ -538,10 +448,6 @@ function game() {
     background(bg);
     background(bg1);
     camera.on();
-
-    if (keyWentDown("p")) {
-        gameState = 4;
-    }
 
     for (let i = 0; i < clouds.length; i++) {
         const cloud = clouds[i];
@@ -584,9 +490,8 @@ function game() {
 
 
     }
-   
 
-    
+
     for (let i = 0; i < danger.length; i++) {
         const danger_box = danger[i];
         if (character.overlap(danger_box)) {
@@ -606,6 +511,14 @@ function game() {
             console.log(hitSc.position.x);
             hitSc.life = 30;
             hits.add(hitSc);
+        } else if (bullets.overlap(danger_box)) {
+            const explosion_anim1 = loadAnimation("images/explosion0.png", "images/explosion7.png");
+            const ex = createSprite(danger_box.position.x, danger_box.position.y);
+            ex.addAnimation("ex", explosion_anim1);
+            ex.life = 40;
+            danger_box.position.x += random(width, width * 3);
+            explosion_sfx[floor(random(0, explosion_sfx.length))].play();
+
 
 
         } else {
@@ -618,21 +531,12 @@ function game() {
         enemies.velocity++;
         if (character.overlap(enemy)) {
             character.lives--;
-            //character + 255;
-            //enemy.remove();
             enemy.position.x += random(width * 2, width * 6);
 
             enter_sfx[floor(random(0, enter_sfx.length))].play();
         } else {
             wrap(enemy, random(width * 2, width * 6));
         }
-
-        //        const hit_anim = loadAnimation("images/hit1.png", "images/hit4.png");
-        //        const hitSc = createSprite(width / 2, height / 2);
-        //        hitSc.addAnimation("hitSc", hit_anim);
-        //        console.log(hitSc.position.x);
-        //        hitSc.life = 100;
-        //        hits.add(hitSc);
 
         for (let i = 0; i < bullets.length; i++) {
             const shoot = bullets[i];
@@ -645,6 +549,7 @@ function game() {
                 shoot.remove();
 
             }
+
         }
     }
 
@@ -689,13 +594,15 @@ function game() {
     /*camera follows character*/
     camera.position.x = character.position.x + width / 2 - 60 // add if want character to start at 0*/;
 
-    drawSprites(bushes);
+    drawSprites(bushes_group);
     drawSprites(walls);
     drawSprites(stuff);
     drawSprites(danger);
     drawSprites(enemies);
     drawSprites(health);
     drawSprites(bullets);
+    drawSprites(coins);
+
 
     /*ui*/
     camera.off();
@@ -707,22 +614,23 @@ function game() {
     image(boxUI, 7, 7);
     text("LIVES: " + character.lives, 73, 43);
     text("COINS: " + character.coinsCount, 76, 74);
-
+    fill(47, 66, 2);
+    text("LEVEL: " + currentLevel, 730, 40)
 
     /* detect game ending */
     if (character.lives <= 0) {
         gameState = 3;
-
         character.velocity.y = 0;
     }
 
     /* detect next level*/
     if (character.overlap(flag)) {
         flag.changeAnimation("flag2");
+        flag_sfx[floor(random(0, flag_sfx.length))].play();
         currentLevel++;
-        setTimeout(function () {
-            gameState = 5;
-        }, 1200);
+        gameState = 4;
+        //        setTimeout(function () {
+        //        }, 1200);
     }
 }
 
@@ -737,9 +645,9 @@ function wrap(obj, reset) {
 }
 
 function shootBullet() {
-   
- 
- var shoot = createSprite(character.position.x + 60, character.position.y - 5);
+
+
+    var shoot = createSprite(character.position.x + 60, character.position.y - 5);
     const shoot1 = loadImage("images/shoot.png");
     shoot.addImage(shoot1);
     var dir = new p5.Vector(shoot.position.x + mouseX, mouseY);
@@ -748,9 +656,9 @@ function shootBullet() {
     dir.mult(10);
     shoot.velocity = dir;
     shoot_sfx[floor(random(0, shoot_sfx.length))].play();
-        bullets.add(shoot);
+    bullets.add(shoot);
 }
-    
+
 function constantMovement() {
     if (keyDown("d")) {
         character.position.x += speed;
@@ -783,3 +691,9 @@ function slidingMovement() {
         character.velocity.y -= 1;
     }
 }
+// add this at the bottom of game.js
+document.addEventListener("keydown", function (event) {
+    if (event.which == 32) {
+        event.preventDefault();
+    }
+});
