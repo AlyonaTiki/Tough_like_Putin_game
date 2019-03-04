@@ -18,6 +18,6 @@ The character was designed from scratch also using real photos.
 My inspiration for the style of the game was a caricature and modern 2d games. 
 Graphics I created for this game is my perception and interpretation of Russian style.
 
-Script
-This game is based on HTML5 and I used not only a pure JS but also additional JS libraries 
+Script:
+this game is based on HTML5 and I used not only a pure JS but also additional JS libraries 
 like p5.js and p5.play to optimazie the game.
