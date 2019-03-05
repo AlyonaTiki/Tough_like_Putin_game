@@ -7,6 +7,7 @@ About the game:
 "Tough like Putin" is a runner game that transfers player to the North Korea. 
 The idea of the game is pretty easy to collect lives and coins as much as you 
 can and earn achievements by reaching checkpoints.
+Instructions: To play the game use mouse to click start button on the screen. In the game use keyboard for movements: space for jumping and D to move chracter forward. Use mouse to aim and left click on mouse button to shoot.
 
 Design process:
 I entirely designed the game including background, character and all the assets. 
