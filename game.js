@@ -1,4 +1,4 @@
-//global variable
+//global variables
 var character, platform, clouds, walls, enemies, bushes, bushes_group, health, coins, stuff, danger, bg, bg1, bgEnd, explosion, shoots, bullets, hits, hits2, flag;
 const speed = 5;
 const GRAVITY = 0.5;
@@ -622,7 +622,7 @@ function shootBullet() {
     shoot_sfx[floor(random(0, shoot_sfx.length))].play();
     bullets.add(shoot);
 }
-
+//character movement
 function constantMovement() {
     if (keyDown("d")) {
         character.position.x += speed;
@@ -655,7 +655,7 @@ function slidingMovement() {
         character.velocity.y -= 1;
     }
 }
-// add this at the bottom of game.js
+
 document.addEventListener("keydown", function (event) {
     if (event.which == 32) {
         event.preventDefault();
