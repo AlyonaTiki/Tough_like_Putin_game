@@ -1,4 +1,4 @@
-/* global variable */
+//global variable
 var character, platform, clouds, walls, enemies, bushes, bushes_group, health, coins, stuff, danger, bg, bg1, bgEnd, explosion, shoots, bullets, hits, hits2, flag;
 const speed = 5;
 const GRAVITY = 0.5;
@@ -7,8 +7,6 @@ const NUM_CLOUDS = 4;
 const NUM_BUSHES = 8;
 const NUM_BUSHES_A = 2;
 const NUM_WALLS = 3;
-//const NUM_ENEMIES = 2;
-//const NUM_HEALTH = 1;
 const NUM_COINS = 5;
 const NUM_DANGER = 3;
 const NUM_FRAMES = 8
@@ -72,6 +70,8 @@ var menus = [
 ];
 var gameState = 0;
 var currentLevel = 1;
+
+//numbers of all assets on each level
 var levelData = {
     0: {
         bushes: 4,
@@ -119,7 +119,8 @@ var levelData = {
         speedMax: speed * 2
     }
 };
-/*audio*/
+
+//audio variables and upload of audio files
 var bg_music;
 var bg_music_int;
 var jump_sfx = []
@@ -201,7 +202,6 @@ function preload() {
 }
 
 function setup() {
-
     bg_music_int.loop();
     bg = loadImage("images/bg1_1.png");
     bg1 = loadImage("images/bg2_5.png");
@@ -218,7 +218,7 @@ function setup() {
     bullets = new Group();
     coins = new Group();
 
-
+//character setup*
     character = createSprite(0, 200, 32, 32);
     const idle_anim = loadAnimation("img/Putin_idle.png");
     const run_anim = loadAnimation("img/Putin_run1.png", "img/Putin_run4.png");
@@ -232,27 +232,21 @@ function setup() {
     character.coinsCount = 0;
     stuff.add(character)
 
-    /*platform setup*/
+//platform setup
     platform = createSprite(width / 2 - 60, height - 20);
     const platform1 = loadImage("images/platform1.png");
     platform.addImage("platform", platform1);
     stuff.add(platform)
 
-    /*flag*/
+//flag
     flag = createSprite(width * 4, height / 2 + 80, width / 3, height / 3);
     const flag_anim = loadAnimation("images/flag10.png", "images/flag18.png");
-    //    const flag_anim2 = loadAnimation("images/flag1.png", "images/flag9.png");
     flag.addAnimation("flag", flag_anim);
-    //    flag.addAnimation("flag2", flag_anim2);
     stuff.add(flag)
-
-    /*obstacles: walls,...*/
-
 
     bushes_group = new Group();
 
-
-    /*danger boxes*/
+//danger boxes
     danger = new Group();
     for (let i = 0; i < NUM_DANGER; i++) {
         const danger_box = createSprite(
@@ -267,10 +261,9 @@ function setup() {
         danger_box.hitCharacter = false;
         danger.add(danger_box);
         danger.life = 8;
-
     }
 
-    /*clouds*/
+//clouds
     clouds = new Group();
     for (let i = 0; i < NUM_CLOUDS; i++) {
         const cloud = createSprite(
@@ -286,7 +279,8 @@ function setup() {
         clouds.add(cloud);
     }
     buildLevel();
-
+	
+//menu
     for (let i = 0; i < menus.length; i++) {
         const menu = menus[i];
         menu.sprites = new Group();
@@ -352,7 +346,6 @@ function buildLevel() {
         walls.add(wall);
     }
     for (let i = 0; i < level.bushes; i++) {
-        // console.log(32, (i + 1) * width / NUM_BUSHES)
         const bushes = createSprite(
             random(i * width / NUM_BUSHES, (i + 1) * width / NUM_BUSHES),
             height * 7 / 9 + 10,
@@ -363,11 +356,10 @@ function buildLevel() {
         const bushes1 = loadImage(imageArray[imageIndex]);
         bushes.addImage("bushes", bushes1);
         bushes_group.add(bushes);
-
     }
 
 }
-
+//changing game states
 function draw() {
     if (gameState == 0) {
         menu(0); //intro();
@@ -382,9 +374,8 @@ function draw() {
     }
 }
 
-
+//menu
 function menu(index) {
-    console.log(currentLevel);
     camera.off();
     background(bg);
     background(bgIntro);
@@ -401,13 +392,10 @@ function menu(index) {
     for (let i = 0; i < menus[index].sprites.length; i++) {
         const button = menus[index].sprites[i];
         button.display();
-
         textAlign(CENTER);
         text(button.text, button.position.x, button.position.y);
-
-
         textSize(20);
-        text("by Alyona Perminova", 230, 430);
+        text("by Alyona Karmazin(Perminova)", 230, 430);
         if (button.mouseIsPressed) {
             button.changeAnimation("click");
             button.clicked = true;
@@ -418,7 +406,6 @@ function menu(index) {
                 if (index == 2 || index == 3) {
                     reset();
                     buildLevel();
-
                 }
             }
         } else {
@@ -426,9 +413,9 @@ function menu(index) {
             button.clicked = false;
         }
     }
-
 }
 
+//Reseting everything, to start game again
 function reset() {
     character.lives = 3;
     character.velocity.y = 0;
@@ -457,16 +444,14 @@ function game() {
         }
     }
 
-    /* keyboard events */
-    //constantMovement();
-    //character.position.x += speed;
+ //keyboard events
     if (keyDown("d")) {
         character.position.x += speed;
         character.changeAnimation("run");
     } else {
         character.changeAnimation("idle");
     }
-    /*prevent character go through the wall and ground*/
+  //prevent character go through the wall and ground
     if (character.collide(platform) || character.collide(walls)) {
         character.velocity.y = 0;
         character.changeAnimation("idle");
@@ -474,28 +459,22 @@ function game() {
             character.isJumping = false;
             hit_sfx[floor(random(0, hit_sfx.length))].play();
         }
-
     } else {
         character.velocity.y += GRAVITY;
     }
-
     if (keyWentDown("space")) {
         if (!character.isJumping) {
             character.changeAnimation("jump")
             character.velocity.y -= JUMP_SPEED;
             character.isJumping = true;
-            /*connection sound to jump and array of jumping sounds*/
+            //connection sound to jump and array of jumping sounds
             jump_sfx[floor(random(0, jump_sfx.length))].play();
         }
-
-
     }
-
 
     for (let i = 0; i < danger.length; i++) {
         const danger_box = danger[i];
         if (character.overlap(danger_box)) {
-            // danger_box.changeAnimation("explosion");
             character.lives--;
             danger_box.hitCharacter = true;
             const explosion_anim = loadAnimation("images/explosion0.png", "images/explosion7.png");
@@ -518,9 +497,6 @@ function game() {
             ex.life = 40;
             danger_box.position.x += random(width, width * 3);
             explosion_sfx[floor(random(0, explosion_sfx.length))].play();
-
-
-
         } else {
             wrap(danger_box, random(width * 2, width * 6));
         }
@@ -532,12 +508,10 @@ function game() {
         if (character.overlap(enemy)) {
             character.lives--;
             enemy.position.x += random(width * 2, width * 6);
-
             enter_sfx[floor(random(0, enter_sfx.length))].play();
         } else {
             wrap(enemy, random(width * 2, width * 6));
         }
-
         for (let i = 0; i < bullets.length; i++) {
             const shoot = bullets[i];
             if (enemy.overlap(shoot)) {
@@ -547,13 +521,11 @@ function game() {
             }
             if (shoot.position.x > character.position.x + width) {
                 shoot.remove();
-
             }
-
         }
     }
 
-
+//when charachter collide hearts(health) it adds lifes
     for (let i = 0; i < health.length; i++) {
         const life = health[i];
         if (character.overlap(life)) {
@@ -563,8 +535,8 @@ function game() {
         } else {
             wrap(life, random(width * 2, width * 6));
         }
-
     }
+//when charachter collide coin it adds coins
     for (let i = 0; i < coins.length; i++) {
         const coin = coins[i];
         if (character.overlap(coins)) {
@@ -577,8 +549,7 @@ function game() {
         }
     }
 
-    /*wrapping sprites*/
-    //wrap(platform, width);
+ //wrapping sprites
     if (character.position.x - platform.position.x >= 40) {
         platform.position.x += width;
     }
@@ -591,9 +562,8 @@ function game() {
         wrap(bushes, random(width * 2 - 50, width * 4));
     }
 
-    /*camera follows character*/
+//camera follows character
     camera.position.x = character.position.x + width / 2 - 60 // add if want character to start at 0*/;
-
     drawSprites(bushes_group);
     drawSprites(walls);
     drawSprites(stuff);
@@ -602,12 +572,10 @@ function game() {
     drawSprites(health);
     drawSprites(bullets);
     drawSprites(coins);
-
-
-    /*ui*/
+	
+//GUI
     camera.off();
     drawSprites(clouds);
-
     hits.draw();
     fill("white");
     textSize(18);
@@ -617,20 +585,18 @@ function game() {
     fill(47, 66, 2);
     text("LEVEL: " + currentLevel, 730, 40)
 
-    /* detect game ending */
+//detect game ending 
     if (character.lives <= 0) {
         gameState = 3;
         character.velocity.y = 0;
     }
 
-    /* detect next level*/
+//detect next level
     if (character.overlap(flag)) {
         flag.changeAnimation("flag2");
         flag_sfx[floor(random(0, flag_sfx.length))].play();
         currentLevel++;
         gameState = 4;
-        //        setTimeout(function () {
-        //        }, 1200);
     }
 }
 
@@ -645,8 +611,6 @@ function wrap(obj, reset) {
 }
 
 function shootBullet() {
-
-
     var shoot = createSprite(character.position.x + 60, character.position.y - 5);
     const shoot1 = loadImage("images/shoot.png");
     shoot.addImage(shoot1);
