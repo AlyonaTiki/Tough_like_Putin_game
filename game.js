@@ -395,7 +395,7 @@ function menu(index) {
         textAlign(CENTER);
         text(button.text, button.position.x, button.position.y);
         textSize(20);
-        text("by Alyona Karmazin(Perminova)", 230, 430);
+        text("by Alyona Karmazin(Perminova)", 200, 430);
         if (button.mouseIsPressed) {
             button.changeAnimation("click");
             button.clicked = true;
