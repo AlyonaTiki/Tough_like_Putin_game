@@ -10,6 +10,7 @@ can and earn achievements by reaching checkpoints.
 Instructions: To play the game use mouse to click start button on the screen. In the game use keyboard for movements: space for jumping and D to move chracter forward. Use mouse to aim and left click on mouse button to shoot.
 
 **Design process:**
+<img src="https://github.com/AlyonaTiki/Tough_like_Putin_game/blob/master/img/assets1.png">
 I entirely designed the game including background, character and all the assets. 
 Using layer over layer technique in background design I added a depth in the 2d 
 image and improved the overall look of the game. I also used photos of real North 
