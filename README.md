@@ -20,5 +20,5 @@ My inspiration for the style of the game was a caricature and modern 2d games.
 Graphics I created for this game is my perception and interpretation of Russian style.
 
 **Script:**
-this game is based on HTML5 and I used not only a pure JS but also additional JS libraries 
+this game is based on HTML5 using JS and additional JS libraries 
 like p5.js and p5.play to optimazie the game.
