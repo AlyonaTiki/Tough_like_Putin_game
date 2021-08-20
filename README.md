@@ -1,8 +1,8 @@
 # Tough like Putin HTML5 game
 ### available at https://tiki2017.itch.io/tough-like-putin <br>
 **Date:** Fall 2017 <br>
-**Author:** Alyona Karmazin(Perminova)
-![Alt Text](https://github.com/AlyonaTiki/Tough_like_Putin_game/blob/master/img/demo.gif)
+**Author:** Alyona Karmazin(Perminova)<br>
+![Alt Text](https://github.com/AlyonaTiki/Tough_like_Putin_game/blob/master/img/demo.gif)<br>
 **About the game:**
 "Tough like Putin" is a runner game that transfers player to the North Korea. 
 The idea of the game is pretty easy to collect lives and coins as much as you 
